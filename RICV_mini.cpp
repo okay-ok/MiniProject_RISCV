@@ -4,17 +4,18 @@
 #include <sstream>
 #include <vector>
 #include <bitset>
+#include "helperFunctions.cpp"
+#include "instructionTypeProcesses.cpp"
 
 using namespace std;
 
 vector<string> R, I, S, SB, U, UJ;                             // Sets to differentiate between different formats of commands
 unordered_map<string, unordered_map<string, string>> instructionData; // Stores Pre-defined data of of all commands
+unordered_map<string, int> labelAddresses;
 
 // Function prototypes
 void initializeInstructionData();
 string instructionToMachineCode(const string& instruction, unordered_map<string, int>& labelAddresses, int& currentAddress);
-string registerToBinary(const string& reg);
-string immediateToBinary(const string& imm, int bits);
 int handleDirective(const string& line, ofstream& mcFile, unordered_map<string, int>& labelAddresses, int& currentAddress);
 
 int main(int argc, char* argv[]) {
@@ -32,17 +33,17 @@ int main(int argc, char* argv[]) {
     }
 
     string line;
-    unordered_map<string, int> labelAddresses;
     int currentAddress = 0;
-    while (getline(asmFile, line)) {
-        if (line.empty() || line[0] == '#') continue; // Skip empty lines and comments
+    while(getline(asmFile, line)) {
+        line = removeWhitespaces(line);
 
-        if (line[0] == '.') {
-            currentAddress += handleDirective(line, mcFile, labelAddresses, currentAddress);
-        } else if (line.back() == ':') {
+        if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
+        else if (line[0] == '.') {
+            currentAddress += handleDirective(line, mcFile, currentAddress);
+        }else if(line.back() == ':') {
             labelAddresses[line.substr(0, line.size() - 1)] = currentAddress;
-        } else {
-            string machineCode = instructionToMachineCode(line, labelAddresses, currentAddress);
+        }else{
+            string machineCode = instructionToMachineCode(line, currentAddress);
             mcFile << machineCode << endl;
             currentAddress += 4; // Assuming each instruction is 4 bytes
         }
@@ -191,22 +192,28 @@ void initializeInstructionData() {
 
 }
 
-string instructionToMachineCode(const string& instruction, unordered_map<string, int>& labelAddresses, int& currentAddress) {
+string instructionToMachineCode(const string& instruction, int& currentAddress) {
+    stringstream ss(instruction);
+    string inst;
+    ss >> inst;
+
+    string instructionCode = "";
+
+    if(instructionData[inst]["type"] == "R") instructionCode = processRType(instruction);
+    else if(instructionData[inst]["type"] == "I") instructionCode = processIType(instruction);
+    else if(instructionData[inst]["type"] == "S") instructionCode = processSType(instruction);
+    else if(instructionData[inst]["type"] == "SB") instructionCode = processSBType(instruction);
+    else if(instructionData[inst]["type"] == "U") instructionCode = processUType(instruction);
+    else if(instructionData[inst]["type"] == "UJ") instructionCode = processUJType(instruction);
+    else {
+        cerr << "ERROR: Unknown instruction '" << inst << "'" << endl;
+        return "";
+    }
     
+    return "0x" + decimalToHexadecimal(currentAddress) + " " + instructionCode;
 }
 
-string registerToBinary(const string& reg) {
-    // Assuming registers are named x0 to x31
-    int regNum = stoi(reg.substr(1)); // Remove the 'x' and convert to int
-    return bitset<5>(regNum).to_string();
-}
-
-string immediateToBinary(const string& imm, int bits) {
-    int value = stoi(imm);
-    return bitset<32>(value).to_string().substr(32 - bits, bits); // Convert to binary and take the last 'bits' bits
-}
-
-int handleDirective(const string& line, ofstream& mcFile, unordered_map<string, int>& labelAddresses, int& currentAddress) {
+int handleDirective(const string& line, ofstream& mcFile, int& currentAddress) {
     stringstream ss(line);
     string directive;
     ss >> directive; // Extract the directive from the line
