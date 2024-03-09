@@ -29,6 +29,25 @@ string decimalToHexadecimal(int decimal) {
     return hex;
 }
 
+string cleanInputLine(const string& input){
+    string output = removeWhitespaces(input);
+    return removeCommasAndInLineConsecutiveWhitespace(output);
+}
+
+string removeCommasAndInLineConsecutiveWhitespace(const string& input) {
+    string output;
+    for (int i = 0; i < input.length(); i++) {
+        if (input[i] == ',') {
+            output.push_back(' ');
+        } else if (input[i] == ' ' && input[i + 1] == ' ') {
+            continue;
+        } else {
+            output.push_back(input[i]);
+        }
+    }
+    return output;
+}
+
 string removeWhitespaces(const string& input) { 
     int i = 0;
     while (input[i] == ' ') { 

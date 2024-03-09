@@ -15,8 +15,8 @@ unordered_map<string, int> labelAddresses;
 
 // Function prototypes
 void initializeInstructionData();
-string instructionToMachineCode(const string& instruction, unordered_map<string, int>& labelAddresses, int& currentAddress);
-int handleDirective(const string& line, ofstream& mcFile, unordered_map<string, int>& labelAddresses, int& currentAddress);
+string instructionToMachineCode(const string& instruction, int& currentAddress);
+int handleDirective(const string& line, ofstream& mcFile, int& currentAddress);
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -34,18 +34,46 @@ int main(int argc, char* argv[]) {
 
     string line;
     int currentAddress = 0;
+    bool isText = true;
     while(getline(asmFile, line)) {
-        line = removeWhitespaces(line);
+        line = cleanInputLine(line);
+
+        // if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
+        // else if (line[0] == '.') {
+        //     currentAddress += handleDirective(line, mcFile, currentAddress);
+        // }else if(line.back() == ':') {
+        //     labelAddresses[line.substr(0, line.size() - 1)] = currentAddress;
+        // }else{
+        //     string machineCode = instructionToMachineCode(line, currentAddress);
+        //     mcFile << machineCode << endl;
+        //     currentAddress += 4; // Assuming each instruction is 4 bytes
+        // }
 
         if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
-        else if (line[0] == '.') {
-            currentAddress += handleDirective(line, mcFile, currentAddress);
-        }else if(line.back() == ':') {
-            labelAddresses[line.substr(0, line.size() - 1)] = currentAddress;
-        }else{
+        else if (line == ".text") {
+            isText = true;
+            continue;
+        }else if (line == ".data") {
+            isText = false;
+            continue;
+        }
+
+        if(isText){
+            int colonIndex = line.find(':');
+            if(colonIndex != string::npos){
+                labelAddresses[line.substr(0, colonIndex)] = currentAddress;
+                line = line.substr(colonIndex + 1);
+            }
+
+            line = removeWhitespaces(line);
+            if(line.empty()) continue;
+            
             string machineCode = instructionToMachineCode(line, currentAddress);
             mcFile << machineCode << endl;
-            currentAddress += 4; // Assuming each instruction is 4 bytes
+        }else{
+            // TODO: Handle label --------------------------------------------------------------------------------------------------------
+            
+
         }
     }
 
