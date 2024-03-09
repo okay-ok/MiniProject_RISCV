@@ -4,19 +4,21 @@
 #include <sstream>
 #include <vector>
 #include <bitset>
+#include "directiveProcesses.cpp"
 #include "helperFunctions.cpp"
 #include "instructionTypeProcesses.cpp"
 
 using namespace std;
 
-vector<string> R, I, S, SB, U, UJ;                             // Sets to differentiate between different formats of commands
+#define MEMORY_START_LOCATION 268435456
+
 unordered_map<string, unordered_map<string, string>> instructionData; // Stores Pre-defined data of of all commands
-unordered_map<string, int> labelAddresses;
+unordered_map<string, int> labelAddresses;                     // Stores the address of all labels
+vector<string> staticMemory;                               // Stores the static memory data
 
 // Function prototypes
 void initializeInstructionData();
 string instructionToMachineCode(const string& instruction, int& currentAddress);
-int handleDirective(const string& line, ofstream& mcFile, int& currentAddress);
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -37,17 +39,6 @@ int main(int argc, char* argv[]) {
     bool isText = true;
     while(getline(asmFile, line)) {
         line = cleanInputLine(line);
-
-        // if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
-        // else if (line[0] == '.') {
-        //     currentAddress += handleDirective(line, mcFile, currentAddress);
-        // }else if(line.back() == ':') {
-        //     labelAddresses[line.substr(0, line.size() - 1)] = currentAddress;
-        // }else{
-        //     string machineCode = instructionToMachineCode(line, currentAddress);
-        //     mcFile << machineCode << endl;
-        //     currentAddress += 4; // Assuming each instruction is 4 bytes
-        // }
 
         if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
         else if (line == ".text") {
@@ -70,11 +61,20 @@ int main(int argc, char* argv[]) {
             
             string machineCode = instructionToMachineCode(line, currentAddress);
             mcFile << machineCode << endl;
+
+            currentAddress += 4;
         }else{
             // TODO: Handle label --------------------------------------------------------------------------------------------------------
-            
-
+            handleDirectives(line, staticMemory);
         }
+    }
+
+    mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 00" << endl; // Add a halt instruction at the end
+    
+    currentAddress = MEMORY_START_LOCATION;
+    for (auto& data : staticMemory) {
+        mcFile << "0x" << decimalToHexadecimal(currentAddress) << " " << data << endl;
+        currentAddress += 4;
     }
 
     asmFile.close();
@@ -241,45 +241,3 @@ string instructionToMachineCode(const string& instruction, int& currentAddress) 
     return "0x" + decimalToHexadecimal(currentAddress) + " " + instructionCode;
 }
 
-int handleDirective(const string& line, ofstream& mcFile, int& currentAddress) {
-    stringstream ss(line);
-    string directive;
-    ss >> directive; // Extract the directive from the line
-
-    if (directive == ".word") {
-        // Handle the .word directive which defines a word of data
-        int value;
-        while (ss >> value) { // Read all values defined by this directive
-            mcFile.write(reinterpret_cast<const char*>(&value), sizeof(value)); // Write the value as binary data
-            currentAddress += 4; // Increase the address by the size of a word
-        }
-    } else if (directive == ".byte") {
-        // Handle the .byte directive which defines a byte of data
-        int value;
-        while (ss >> value) {
-            char byteValue = static_cast<char>(value);
-            mcFile.write(&byteValue, sizeof(byteValue)); // Write the byte value
-            currentAddress += 1; // Increase the address by the size of a byte
-        }
-    } else if (directive == ".half") {
-        // Handle the .half directive which defines a halfword (2 bytes) of data
-        int value;
-        while (ss >> value) {
-            short halfValue = static_cast<short>(value);
-            mcFile.write(reinterpret_cast<const char*>(&halfValue), sizeof(halfValue)); // Write the halfword value
-            currentAddress += 2; // Increase the address by the size of a halfword
-        }
-    } else if (directive == ".text") {
-        // This directive might be used to indicate the start of the text (code) section
-        // For simplicity, we do not handle it here but acknowledge its presence
-    } else if (directive == ".data") {
-        // This directive indicates the start of the data section
-        // Set the current address to the start of the data segment
-        currentAddress = 0x10000000;
-    } else {
-        cerr << "ERROR: Unknown directive '" << directive << "'" << endl;
-        return -1; // Return an error code for unknown directive
-    }
-
-    return 0; // Return success code
-}

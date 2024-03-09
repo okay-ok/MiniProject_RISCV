@@ -4,13 +4,12 @@
 
 using namespace std;
 
-string registerToBinary(const string& reg) {
-    // Assuming registers are named x0 to x31
+string registerToBinary(string reg) {
     int regNum = stoi(reg.substr(1)); // Remove the 'x' and convert to int
     return bitset<5>(regNum).to_string();
 }
 
-string immediateToBinary(const string& imm, int bits) {
+string immediateToBinary(string imm, int bits) {
     int value = stoi(imm);
     return bitset<32>(value).to_string().substr(32 - bits, bits); // Convert to binary and take the last 'bits' bits
 }
@@ -29,12 +28,12 @@ string decimalToHexadecimal(int decimal) {
     return hex;
 }
 
-string cleanInputLine(const string& input){
+string cleanInputLine(string input){
     string output = removeWhitespaces(input);
     return removeCommasAndInLineConsecutiveWhitespace(output);
 }
 
-string removeCommasAndInLineConsecutiveWhitespace(const string& input) {
+string removeCommasAndInLineConsecutiveWhitespace(string input) {
     string output;
     for (int i = 0; i < input.length(); i++) {
         if (input[i] == ',') {
@@ -48,7 +47,7 @@ string removeCommasAndInLineConsecutiveWhitespace(const string& input) {
     return output;
 }
 
-string removeWhitespaces(const string& input) { 
+string removeWhitespaces(string input) { 
     int i = 0;
     while (input[i] == ' ') { 
         i++; 
