@@ -1,13 +1,17 @@
 #include <iostream>
+#include <bits/stdc++.h>
 #include <fstream>
 #include <sstream>
-#include <unordered_map>
 #include <vector>
 #include <bitset>
 
 using namespace std;
 
+vector<string> R, I, S, SB, U, UJ;                             // Sets to differentiate between different formats of commands
+unordered_map<string, unordered_map<string, string>> instructionData; // Stores Pre-defined data of of all commands
+
 // Function prototypes
+void initializeInstructionData();
 string instructionToMachineCode(const string& instruction, unordered_map<string, int>& labelAddresses, int& currentAddress);
 string registerToBinary(const string& reg);
 string immediateToBinary(const string& imm, int bits);
@@ -51,51 +55,144 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+void initializeInstructionData() {
+    instructionData["add"]["opcode"] = "0110011";
+    instructionData["add"]["func3"] = "000";
+    instructionData["add"]["func7"] = "0000000";
+    instructionData["add"]["type"] = "R";
+
+    instructionData["and"]["opcode"] = "0110011";
+    instructionData["and"]["func3"] = "111";
+    instructionData["and"]["func7"] = "0000000";
+    instructionData["and"]["type"] = "R";
+
+    instructionData["or"]["opcode"] = "0110011";
+    instructionData["or"]["func3"] = "110";
+    instructionData["or"]["func7"] = "0000000";
+    instructionData["or"]["type"] = "R";
+
+    instructionData["sll"]["opcode"] = "0110011";
+    instructionData["sll"]["func3"] = "001";
+    instructionData["sll"]["func7"] = "0000000";
+    instructionData["sll"]["type"] = "R";
+
+    instructionData["slt"]["opcode"] = "0110011";
+    instructionData["slt"]["func3"] = "010";
+    instructionData["slt"]["func7"] = "0000000";
+    instructionData["slt"]["type"] = "R";
+
+    instructionData["sra"]["opcode"] = "0110011";
+    instructionData["sra"]["func3"] = "101";
+    instructionData["sra"]["func7"] = "0100000";
+    instructionData["sra"]["type"] = "R";
+
+    instructionData["srl"]["opcode"] = "0110011";
+    instructionData["srl"]["func3"] = "101";
+    instructionData["srl"]["func7"] = "0000000";
+    instructionData["srl"]["type"] = "R";
+
+    instructionData["sub"]["opcode"] = "0110011";
+    instructionData["sub"]["func3"] = "000";
+    instructionData["sub"]["func7"] = "0100000";
+    instructionData["sub"]["type"] = "R";
+
+    instructionData["xor"]["opcode"] = "0110011";
+    instructionData["xor"]["func3"] = "100";
+    instructionData["xor"]["func7"] = "0000000";
+    instructionData["xor"]["type"] = "R";
+
+    instructionData["mul"]["opcode"] = "0110011";
+    instructionData["mul"]["func3"] = "000";
+    instructionData["mul"]["func7"] = "0000001";
+    instructionData["mul"]["type"] = "R";
+
+    instructionData["div"]["opcode"] = "0110011";
+    instructionData["div"]["func3"] = "100";
+    instructionData["div"]["func7"] = "0000001";
+    instructionData["div"]["type"] = "R";
+
+    instructionData["rem"]["opcode"] = "0110011";
+    instructionData["rem"]["func3"] = "110";
+    instructionData["rem"]["func7"] = "0000001";
+    instructionData["rem"]["type"] = "R";
+
+    instructionData["addi"]["opcode"] = "0010011";
+    instructionData["addi"]["func3"] = "000";
+    instructionData["addi"]["type"] = "I";
+
+    instructionData["andi"]["opcode"] = "0010011";
+    instructionData["andi"]["func3"] = "111";
+    instructionData["andi"]["type"] = "I";
+
+    instructionData["ori"]["opcode"] = "0010011";
+    instructionData["ori"]["func3"] = "110";
+    instructionData["ori"]["type"] = "I";
+
+    instructionData["lb"]["opcode"] = "0000011";
+    instructionData["lb"]["func3"] = "000";
+    instructionData["lb"]["type"] = "I";
+
+    instructionData["lh"]["opcode"] = "0000011";
+    instructionData["lh"]["func3"] = "001";
+    instructionData["lh"]["type"] = "I";
+
+    instructionData["lw"]["opcode"] = "0000011";
+    instructionData["lw"]["func3"] = "010";
+    instructionData["lw"]["type"] = "I";
+
+    instructionData["ld"]["opcode"] = "0000011";
+    instructionData["ld"]["func3"] = "011";
+    instructionData["ld"]["type"] = "I";
+
+    instructionData["jalr"]["opcode"] = "1100111";
+    instructionData["jalr"]["func3"] = "000";
+    instructionData["jalr"]["type"] = "I";
+
+    instructionData["sb"]["opcode"] = "0100011";
+    instructionData["sb"]["func3"] = "000";
+    instructionData["sb"]["type"] = "S";
+
+    instructionData["sh"]["opcode"] = "0100011";
+    instructionData["sh"]["func3"] = "001";
+    instructionData["sh"]["type"] = "S";
+
+    instructionData["sw"]["opcode"] = "0100011";
+    instructionData["sw"]["func3"] = "010";
+    instructionData["sw"]["type"] = "S";
+
+    instructionData["sd"]["opcode"] = "0100011";
+    instructionData["sd"]["func3"] = "011";
+    instructionData["sd"]["type"] = "S";
+
+    instructionData["beq"]["opcode"] = "1100011";
+    instructionData["beq"]["func3"] = "000";
+    instructionData["beq"]["type"] = "SB";
+
+    instructionData["bne"]["opcode"] = "1100011";
+    instructionData["bne"]["func3"] = "001";
+    instructionData["bne"]["type"] = "SB";
+
+    instructionData["blt"]["opcode"] = "1100011";
+    instructionData["blt"]["func3"] = "100";
+    instructionData["blt"]["type"] = "SB";
+
+    instructionData["bge"]["opcode"] = "1100011";
+    instructionData["bge"]["func3"] = "101";
+    instructionData["bge"]["type"] = "SB";
+
+    instructionData["auipc"]["opcode"] = "0010111";
+    instructionData["auipc"]["type"] = "U";
+
+    instructionData["lui"]["opcode"] = "0110111";
+    instructionData["lui"]["type"] = "U";
+
+    instructionData["jal"]["opcode"] = "1101111";
+    instructionData["jal"]["type"] = "UJ";
+
+}
+
 string instructionToMachineCode(const string& instruction, unordered_map<string, int>& labelAddresses, int& currentAddress) {
-    stringstream ss(instruction);
-    string opcode, rd, rs1, rs2, imm;
-    ss >> opcode;
-
-    // Implementing the instructions as per the requirement
-    unordered_map<string, string> opcodeMap = {
-        {"add", "0110011"}, {"and", "0110011"}, {"or", "0110011"}, {"sll", "0110011"},
-        {"slt", "0110011"}, {"sra", "0110011"}, {"sub", "0110011"}, {"xor", "0110011"},
-        {"mul", "0110011"}, {"div", "0110011"}, {"rem", "0110011"}, {"addi", "0010011"},
-        {"andi", "0010011"}, {"ori", "0010011"}, {"lb", "0000011"}, {"ld", "0000011"},
-        {"lh", "0000011"}, {"lw", "0000011"}, {"jalr", "1100111"}, {"sb", "0100011"},
-        {"sw", "0100011"}, {"sd", "0100011"}, {"sh", "0100011"}, {"beq", "1100011"},
-        {"bne", "1100011"}, {"bge", "1100011"}, {"blt", "1100011"}, {"auipc", "0010111"},
-        {"lui", "0110111"}, {"jal", "1101111"}
-    };
-
-    // Implementing the function type mapping
-    unordered_map<string, string> funct3Map = {
-        {"add", "000"}, {"and", "111"}, {"or", "110"}, {"sll", "001"},
-        {"slt", "010"}, {"sra", "101"}, {"sub", "000"}, {"xor", "100"},
-        {"mul", "000"}, {"div", "100"}, {"rem", "110"}, {"addi", "000"},
-        {"andi", "111"}, {"ori", "110"}, {"lb", "000"}, {"ld", "011"},
-        {"lh", "001"}, {"lw", "010"}, {"jalr", "000"}, {"sb", "000"},
-        {"sw", "010"}, {"sd", "011"}, {"sh", "001"}, {"beq", "000"},
-        {"bne", "001"}, {"bge", "101"}, {"blt", "100"}, {"auipc", ""},
-        {"lui", ""}, {"jal", ""}
-    };
-
-    // Implementing the funct7 mapping
-    unordered_map<string, string> funct7Map = {
-        {"add", "0000000"}, {"sub", "0100000"}, {"sra", "0100000"},
-        {"mul", "0000001"}, {"div", "0000001"}, {"rem", "0000001"}
-    };
-
-    // Implementing the instruction encoding
-    if (opcodeMap.find(opcode) != opcodeMap.end()) {
-        ss >> rd >> rs1 >> rs2;
-        string funct7 = funct7Map[opcode];
-        string funct3 = funct3Map[opcode];
-        string opcodeBin = opcodeMap[opcode];
-        return funct7 + registerToBinary(rs2) + registerToBinary(rs1) + funct3 + registerToBinary(rd) + opcodeBin;
-    }
-
-    return "ERROR: Unknown instruction";
+    
 }
 
 string registerToBinary(const string& reg) {
