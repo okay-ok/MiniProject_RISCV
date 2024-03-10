@@ -13,15 +13,19 @@ using namespace std;
 #define MEMORY_START_LOCATION 268435456
 
 unordered_map<string, unordered_map<string, string>> instructionData; // Stores Pre-defined data of of all commands
-unordered_map<string, int> labelAddresses;                     // Stores the address of all labels
-vector<string> staticMemory;                               // Stores the static memory data
-
+unordered_map<string, int> labelAddresses;                            // Stores the address of all labels
+vector<string> staticMemory;                                          // Stores the static memory data
+unordered_map<string, string> opcodeData;
+unordered_map<string, string> func3Data;
+unordered_map<string, string> func7Data;
+unordered_map<string, string> instructionTypeData;
 // Function prototypes
 void initializeInstructionData();
 
-int main(int argc, char* argv[]) 
+int main(int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 3)
+    {
         cerr << "Usage: " << argv[0] << " <input.asm> <output.mc>" << endl;
         return 1;
     }
@@ -29,7 +33,8 @@ int main(int argc, char* argv[])
     ifstream asmFile(argv[1]);
     ofstream mcFile(argv[2]);
 
-    if (!asmFile.is_open() || !mcFile.is_open()) {
+    if (!asmFile.is_open() || !mcFile.is_open())
+    {
         cerr << "Error opening files." << endl;
         return 1;
     }
@@ -39,58 +44,96 @@ int main(int argc, char* argv[])
     string line;
     int currentAddress = 0;
     bool isText = true;
-    while(getline(asmFile, line)) {
-        line = cleanInputLine(line);
 
-        if(line.empty() || line[0] == '#') continue; // Skip empty lines and comments
-        else if (line == ".text") {
+    while (getline(asmFile, line))
+    {
+        line = cleanInputLine(line);
+        if (line.empty() || line[0] == '#') continue; // Skip empty lines and comments
+
+        if (line == ".text"){
             isText = true;
             continue;
-        }else if (line == ".data") {
+        }
+        else if (line == ".data"){
             isText = false;
             continue;
         }
 
-        if(isText){
+        if (isText)
+        {
             int colonIndex = line.find(':');
-            if(colonIndex != string::npos)
+            if (colonIndex != string::npos)
             {
-                labelAddresses[line.substr(0, colonIndex)] = currentAddress;
+                labelAddresses[line.substr(0, colonIndex + 1)] = currentAddress;
                 line = line.substr(colonIndex + 1);
             }
-
             line = removeWhitespaces(line);
-            if(line.empty()) continue;
-            
-            string machineCode = instructionToMachineCode(line, currentAddress, instructionData, labelAddresses);
-            mcFile << machineCode << endl;
-
             currentAddress += 4;
-        }else{
-            // TODO: Handle label --------------------------------------------------------------------------------------------------------
-            handleDirectives(line, staticMemory);
         }
     }
 
-    mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 00" << endl; // Halt instruction at the end
-    
-    currentAddress = MEMORY_START_LOCATION;
-    for (auto& data : staticMemory) {
-        mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 0x" << data << endl;
-        currentAddress++;
+asmFile.close();
+asmFile.open(argv[1]);
+
+currentAddress = 0;
+while (getline(asmFile, line))
+{
+    line = cleanInputLine(line);
+
+    if (line.empty() || line[0] == '#')
+        continue; // Skip empty lines and comments
+    else if (line == ".text")
+    {
+        isText = true;
+        continue;
+    }
+    else if (line == ".data")
+    {
+        isText = false;
+        continue;
     }
 
-    asmFile.close();
-    mcFile.close();
+    if (isText)
+    {
+        int colonIndex = line.find(':');
+        if (colonIndex != string::npos)
+        {
+            labelAddresses[line.substr(0, colonIndex + 1)] = currentAddress;
+            line = line.substr(colonIndex + 1);
+        }
+        line = removeWhitespaces(line);
+        string machineCode;
+        if(line != ""){
+            machineCode = instructionToMachineCode(line, currentAddress, opcodeData, func3Data, func7Data, labelAddresses, instructionTypeData);
+            mcFile << machineCode << endl;
+        }
 
-    cout << "Assembly completed." << endl;
-    return 0;
+        currentAddress += 4;
+    }
+    else
+    {
+        handleDirectives(line, staticMemory);
+    }
 }
- unordered_map<string, string> opcodeData;
-    unordered_map<string, string> func3Data;
-    unordered_map<string, string> func7Data;
-void initializeInstructionData() {
-   
+
+mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 00" << endl; // Halt instruction at the end
+
+currentAddress = MEMORY_START_LOCATION;
+for (auto &data : staticMemory)
+{
+    mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 0x" << data << endl;
+    currentAddress++;
+}
+
+asmFile.close();
+mcFile.close();
+
+cout << "Assembly completed." << endl;
+return 0;
+}
+
+void initializeInstructionData()
+{
 
     opcodeData["add"] = "0110011";
     opcodeData["and"] = "0110011";
@@ -188,7 +231,35 @@ void initializeInstructionData() {
     func7Data["lui"] = "";
     func7Data["jal"] = "";
 
-
-
+    instructionTypeData["add"] = "R";
+    instructionTypeData["and"] = "R";
+    instructionTypeData["or"] = "R";
+    instructionTypeData["sll"] = "R";
+    instructionTypeData["slt"] = "R";
+    instructionTypeData["sra"] = "R";
+    instructionTypeData["srl"] = "R";
+    instructionTypeData["sub"] = "R";
+    instructionTypeData["xor"] = "R";
+    instructionTypeData["mul"] = "R";
+    instructionTypeData["div"] = "R";
+    instructionTypeData["rem"] = "R";
+    instructionTypeData["addi"] = "I";
+    instructionTypeData["andi"] = "I";
+    instructionTypeData["ori"] = "I";
+    instructionTypeData["lb"] = "I";
+    instructionTypeData["lh"] = "I";
+    instructionTypeData["lw"] = "I";
+    instructionTypeData["ld"] = "I";
+    instructionTypeData["jalr"] = "I";
+    instructionTypeData["sb"] = "S";
+    instructionTypeData["sh"] = "S";
+    instructionTypeData["sw"] = "S";
+    instructionTypeData["sd"] = "S";
+    instructionTypeData["beq"] = "SB";
+    instructionTypeData["bne"] = "SB";
+    instructionTypeData["blt"] = "SB";
+    instructionTypeData["bge"] = "SB";
+    instructionTypeData["auipc"] = "U";
+    instructionTypeData["lui"] = "U";
+    instructionTypeData["jal"] = "UJ";
 }
-

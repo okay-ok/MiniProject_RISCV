@@ -10,8 +10,11 @@ string registerToBinary(string reg) {
     return bitset<5>(regNum).to_string();
 }
 
-string immediateToBinary(int imm, int bits=12) {
-    return bitset<bits>(imm).to_string();
+string immediateToBinary(string imm, int bits) {
+    int immNum = stoi(imm);
+    if(bits == 12) return bitset<12>(immNum).to_string();
+    else if(bits == 20) return bitset<20>(immNum).to_string();
+    else return bitset<21>(immNum).to_string();
 }
 
 string decimalToHexadecimal(int decimal) {
@@ -31,6 +34,23 @@ string decimalToHexadecimal(int decimal) {
     return hex;
 }
 
+string longDecimalToHexadecimal(long long decimal) {
+    string hex;
+    while (decimal > 0) {
+        int remainder = decimal % 16;
+        if (remainder < 10)
+            hex.push_back('0' + remainder);
+        else
+            hex.push_back('A' + remainder - 10);
+        decimal /= 16;
+    }
+    reverse(hex.begin(), hex.end());
+    while (hex.size() < 16) {
+        hex.insert(hex.begin(), '0');
+    }
+    return hex;
+}
+
 string binaryToHexadecimal(string binary){
     string hex;
     for(int i = 0; i < binary.length(); i += 4){
@@ -45,6 +65,7 @@ string binaryToHexadecimal(string binary){
             hex.push_back('A' + decimal - 10);
         }
     }
+    return hex;
 }
 
 string removeCommasAndInLineConsecutiveWhitespace(string input) {
