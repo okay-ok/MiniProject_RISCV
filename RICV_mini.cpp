@@ -4,8 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <bitset>
+#include "helperFunctions.h"
 #include "directiveProcesses.cpp"
-#include "helperFunctions.cpp"
 #include "instructionTypeProcesses.cpp"
 
 using namespace std;
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     currentAddress = MEMORY_START_LOCATION;
     for (auto& data : staticMemory) {
         mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 0x" << data << endl;
-        currentAddress += 4;
+        currentAddress++;
     }
 
     asmFile.close();

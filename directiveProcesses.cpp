@@ -2,7 +2,7 @@
 #include <string>
 #include <bits/stdc++.h>
 #include <sstream>
-#include <helperFunctions.cpp>
+#include "helperFunctions.h"
 
 using namespace std;
 
@@ -14,43 +14,39 @@ void handleDirectives(string instruction, vector<string>& staticMemory){
     int num;
     string hex;
     if(directive == ".asciiz"){
-        string data;
-        ss >> data;
+        instruction = instruction.substr(instruction.find_first_of('"') + 1, instruction.find_last_of('"') - instruction.find_first_of('"') - 1);
 
-        for(int i = 1; i < data.length() - 1; i++){
-            num = data[i];
+        for(int i = 0; i < instruction.length(); i++){
+            num = instruction[i];
             hex = decimalToHexadecimal(num);
-            staticMemory.push_back(hex);
+            staticMemory.push_back(hex.substr(6, 2));
+            
         }
         staticMemory.push_back("00");
     }else if(directive == ".word"){
         while (ss >> num) {
-            num = num%(1 << 32);
             hex = decimalToHexadecimal(num);
-            for(int j = 0; j < 4; j++){
+            for(int j = 3; j >= 0; j--){
                 staticMemory.push_back(hex.substr(j * 2, 2));
             }
         }
     }else if(directive == ".half"){
         while (ss >> num) {
-            num = num%(1 << 16);
             hex = decimalToHexadecimal(num);
-            for(int j = 0; j < 2; j++){
+            for(int j = 3; j >= 2; j--){
                 staticMemory.push_back(hex.substr(j * 2, 2));
             }
         }
     }else if(directive == ".byte"){
         while (ss >> num) {
-            num = num%(1 << 8);
             hex = decimalToHexadecimal(num);
             staticMemory.push_back(hex);
         }
     }else if(directive == ".dword"){
         long long num;
-        num = num%(1 << 64);
         while (ss >> num) {
             hex = decimalToHexadecimal(num);
-            for(int j = 0; j < 8; j++){
+            for(int j = 7; j >= 0; j--){
                 staticMemory.push_back(hex.substr(j * 2, 2));
             }
         }

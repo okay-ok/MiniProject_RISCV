@@ -2,8 +2,45 @@
 #include <string>
 #include <sstream>
 #include <bits/stdc++.h>
+#include "helperFunctions.h"
 
 using namespace std;
+
+string processRType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+    stringstream ss(instruction);
+    string inst;
+    ss >> inst;
+
+    string opcode, rd, funct3, rs1, rs2, funct7;
+
+    ss >> rd >> rs1 >> rs2;
+    opcode = instructionData[inst]["opcode"];
+    funct3 = instructionData[inst]["funct3"];
+    funct7 = instructionData[inst]["funct7"];
+
+    string machineCode = funct7 + registerToBinary(rs2) + registerToBinary(rs1) + funct3 + registerToBinary(rd) + opcode;
+    return binaryToHexadecimal(machineCode);
+}
+
+string processIType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+
+}
+
+string processSType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+
+}
+
+string processSBType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+
+}
+
+string processUType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+
+}
+
+string processUJType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
+    
+}
 
 string instructionToMachineCode(string instruction, int currentAddress, unordered_map<string, unordered_map<string, string>>& instructionData, unordered_map<string, int>& labelAddresses) {
     stringstream ss(instruction);
@@ -24,40 +61,4 @@ string instructionToMachineCode(string instruction, int currentAddress, unordere
     }
     
     return "0x" + decimalToHexadecimal(currentAddress) + " " + instructionCode;
-}
-
-string processRType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-    stringstream ss(instruction);
-    string inst;
-    ss >> inst;
-
-    string opcode, rd, funct3, rs1, rs2, funct7;
-
-    ss >> rd >> rs1 >> rs2;
-    opcode = instructionData[inst]["opcode"];
-    funct3 = instructionData[inst]["funct3"];
-    funct7 = instructionData[inst]["funct7"];
-
-    string machineCode = funct7 + registerToBinary(rs2) + registerToBinary(rs1) + funct3 + registerToBinary(rd) + opcode;
-    return binaryToHexadecimal(machineCode);
-}
-
-string processIType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-    
-}
-
-string processSType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-
-}
-
-string processSBType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-
-}
-
-string processUType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-
-}
-
-string processUJType(string instruction, unordered_map<string, unordered_map<string, string>>& instructionData){
-    
 }

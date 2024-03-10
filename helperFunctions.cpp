@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
+#include "helperFunctions.h"
 
 using namespace std;
 
@@ -25,6 +26,9 @@ string decimalToHexadecimal(int decimal) {
         decimal /= 16;
     }
     reverse(hex.begin(), hex.end());
+    while (hex.size() < 8) {
+        hex.insert(hex.begin(), '0');
+    }
     return hex;
 }
 
@@ -42,11 +46,6 @@ string binaryToHexadecimal(string binary){
             hex.push_back('A' + decimal - 10);
         }
     }
-}
-
-string cleanInputLine(string input){
-    string output = removeWhitespaces(input);
-    return removeCommasAndInLineConsecutiveWhitespace(output);
 }
 
 string removeCommasAndInLineConsecutiveWhitespace(string input) {
@@ -75,5 +74,10 @@ string removeWhitespaces(string input) {
     }
 
     return input.substr(i, j + 1); 
+}
+
+string cleanInputLine(string input){
+    string output = removeWhitespaces(input);
+    return removeCommasAndInLineConsecutiveWhitespace(output);
 }
 
