@@ -83,9 +83,9 @@ string processSBType(string instruction, unordered_map<string,  string>& opcodeD
     opcode = opcodeData[inst];
     funct3 = func3Data[inst];
 
-    imm=immediateToBinary(to_string(labelAddresses[imm] - currentAddress), 12);
+    imm=immediateToBinary(to_string(labelAddresses[imm] - currentAddress), 13);
     string imm1 = imm.substr(0, 1);
-    string imm2 = imm.substr(7, 4);
+    string imm2 = imm.substr(8, 4);
     string imm3 = imm.substr(2, 6);
     string imm4 = imm.substr(1, 1);
     string machineCode = imm1 + imm3 + registerToBinary(rs1) + registerToBinary(rs2) + funct3 + imm2 + imm4 + opcode;

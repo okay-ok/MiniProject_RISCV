@@ -13,6 +13,7 @@ string registerToBinary(string reg) {
 string immediateToBinary(string imm, int bits) {
     int immNum = stoi(imm);
     if(bits == 12) return bitset<12>(immNum).to_string();
+    else if(bits == 13) return bitset<13>(immNum).to_string();
     else if(bits == 20) return bitset<20>(immNum).to_string();
     else return bitset<21>(immNum).to_string();
 }
