@@ -18,7 +18,6 @@ vector<string> staticMemory;                               // Stores the static 
 
 // Function prototypes
 void initializeInstructionData();
-string instructionToMachineCode(const string& instruction, int& currentAddress);
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -33,6 +32,8 @@ int main(int argc, char* argv[]) {
         cerr << "Error opening files." << endl;
         return 1;
     }
+
+    initializeInstructionData();
 
     string line;
     int currentAddress = 0;
@@ -59,7 +60,7 @@ int main(int argc, char* argv[]) {
             line = removeWhitespaces(line);
             if(line.empty()) continue;
             
-            string machineCode = instructionToMachineCode(line, currentAddress);
+            string machineCode = instructionToMachineCode(line, currentAddress, instructionData, labelAddresses);
             mcFile << machineCode << endl;
 
             currentAddress += 4;
@@ -69,11 +70,11 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 00" << endl; // Add a halt instruction at the end
+    mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 00" << endl; // Halt instruction at the end
     
     currentAddress = MEMORY_START_LOCATION;
     for (auto& data : staticMemory) {
-        mcFile << "0x" << decimalToHexadecimal(currentAddress) << " " << data << endl;
+        mcFile << "0x" << decimalToHexadecimal(currentAddress) << " 0x" << data << endl;
         currentAddress += 4;
     }
 
@@ -218,26 +219,5 @@ void initializeInstructionData() {
     instructionData["jal"]["opcode"] = "1101111";
     instructionData["jal"]["type"] = "UJ";
 
-}
-
-string instructionToMachineCode(const string& instruction, int& currentAddress) {
-    stringstream ss(instruction);
-    string inst;
-    ss >> inst;
-
-    string instructionCode = "";
-
-    if(instructionData[inst]["type"] == "R") instructionCode = processRType(instruction);
-    else if(instructionData[inst]["type"] == "I") instructionCode = processIType(instruction);
-    else if(instructionData[inst]["type"] == "S") instructionCode = processSType(instruction);
-    else if(instructionData[inst]["type"] == "SB") instructionCode = processSBType(instruction);
-    else if(instructionData[inst]["type"] == "U") instructionCode = processUType(instruction);
-    else if(instructionData[inst]["type"] == "UJ") instructionCode = processUJType(instruction);
-    else {
-        cerr << "ERROR: Unknown instruction '" << inst << "'" << endl;
-        return "";
-    }
-    
-    return "0x" + decimalToHexadecimal(currentAddress) + " " + instructionCode;
 }
 

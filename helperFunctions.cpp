@@ -28,6 +28,22 @@ string decimalToHexadecimal(int decimal) {
     return hex;
 }
 
+string binaryToHexadecimal(string binary){
+    string hex;
+    for(int i = 0; i < binary.length(); i += 4){
+        int decimal = 0;
+        for(int j = 0; j < 4; j++){
+            decimal *= 2;
+            decimal += binary[i + j] - '0';
+        }
+        if(decimal < 10){
+            hex.push_back('0' + decimal);
+        }else{
+            hex.push_back('A' + decimal - 10);
+        }
+    }
+}
+
 string cleanInputLine(string input){
     string output = removeWhitespaces(input);
     return removeCommasAndInLineConsecutiveWhitespace(output);

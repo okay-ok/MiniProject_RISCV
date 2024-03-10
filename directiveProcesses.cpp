@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
+#include <sstream>
 #include <helperFunctions.cpp>
 
 using namespace std;
