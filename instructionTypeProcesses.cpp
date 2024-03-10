@@ -83,7 +83,10 @@ string processSBType(string instruction, unordered_map<string,  string>& opcodeD
     opcode = opcodeData[inst];
     funct3 = func3Data[inst];
 
-    imm=immediateToBinary(to_string(labelAddresses[imm] - currentAddress), 13);
+    int immnum=labelAddresses[imm]-currentAddress;
+
+    imm=to_string(immnum);
+    imm=immediateToBinary(imm, 13);
     string imm1 = imm.substr(0, 1);
     string imm2 = imm.substr(8, 4);
     string imm3 = imm.substr(2, 6);

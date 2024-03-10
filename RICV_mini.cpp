@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
             int colonIndex = line.find(':');
             if (colonIndex != string::npos)
             {
-                labelAddresses[line.substr(0, colonIndex + 1)] = currentAddress;
+                labelAddresses[line.substr(0, colonIndex)] = currentAddress;
                 line = line.substr(colonIndex + 1);
             }
             line = removeWhitespaces(line);
@@ -98,7 +98,6 @@ while (getline(asmFile, line))
         int colonIndex = line.find(':');
         if (colonIndex != string::npos)
         {
-            labelAddresses[line.substr(0, colonIndex + 1)] = currentAddress;
             line = line.substr(colonIndex + 1);
         }
         line = removeWhitespaces(line);
@@ -106,6 +105,8 @@ while (getline(asmFile, line))
         if(line != ""){
             machineCode = instructionToMachineCode(line, currentAddress, opcodeData, func3Data, func7Data, labelAddresses, instructionTypeData);
             mcFile << machineCode << endl;
+        }else{
+            continue;
         }
 
         currentAddress += 4;
