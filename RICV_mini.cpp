@@ -19,7 +19,8 @@ vector<string> staticMemory;                               // Stores the static 
 // Function prototypes
 void initializeInstructionData();
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " <input.asm> <output.mc>" << endl;
         return 1;
@@ -52,7 +53,8 @@ int main(int argc, char* argv[]) {
 
         if(isText){
             int colonIndex = line.find(':');
-            if(colonIndex != string::npos){
+            if(colonIndex != string::npos)
+            {
                 labelAddresses[line.substr(0, colonIndex)] = currentAddress;
                 line = line.substr(colonIndex + 1);
             }
@@ -84,140 +86,109 @@ int main(int argc, char* argv[]) {
     cout << "Assembly completed." << endl;
     return 0;
 }
-
+ unordered_map<string, string> opcodeData;
+    unordered_map<string, string> func3Data;
+    unordered_map<string, string> func7Data;
 void initializeInstructionData() {
-    instructionData["add"]["opcode"] = "0110011";
-    instructionData["add"]["func3"] = "000";
-    instructionData["add"]["func7"] = "0000000";
-    instructionData["add"]["type"] = "R";
+   
 
-    instructionData["and"]["opcode"] = "0110011";
-    instructionData["and"]["func3"] = "111";
-    instructionData["and"]["func7"] = "0000000";
-    instructionData["and"]["type"] = "R";
+    opcodeData["add"] = "0110011";
+    opcodeData["and"] = "0110011";
+    opcodeData["or"] = "0110011";
+    opcodeData["sll"] = "0110011";
+    opcodeData["slt"] = "0110011";
+    opcodeData["sra"] = "0110011";
+    opcodeData["srl"] = "0110011";
+    opcodeData["sub"] = "0110011";
+    opcodeData["xor"] = "0110011";
+    opcodeData["mul"] = "0110011";
+    opcodeData["div"] = "0110011";
+    opcodeData["rem"] = "0110011";
+    opcodeData["addi"] = "0010011";
+    opcodeData["andi"] = "0010011";
+    opcodeData["ori"] = "0010011";
+    opcodeData["lb"] = "0000011";
+    opcodeData["lh"] = "0000011";
+    opcodeData["lw"] = "0000011";
+    opcodeData["ld"] = "0000011";
+    opcodeData["jalr"] = "1100111";
+    opcodeData["sb"] = "0100011";
+    opcodeData["sh"] = "0100011";
+    opcodeData["sw"] = "0100011";
+    opcodeData["sd"] = "0100011";
+    opcodeData["beq"] = "1100011";
+    opcodeData["bne"] = "1100011";
+    opcodeData["blt"] = "1100011";
+    opcodeData["bge"] = "1100011";
+    opcodeData["auipc"] = "0010111";
+    opcodeData["lui"] = "0110111";
+    opcodeData["jal"] = "1101111";
 
-    instructionData["or"]["opcode"] = "0110011";
-    instructionData["or"]["func3"] = "110";
-    instructionData["or"]["func7"] = "0000000";
-    instructionData["or"]["type"] = "R";
+    func3Data["add"] = "000";
+    func3Data["and"] = "111";
+    func3Data["or"] = "110";
+    func3Data["sll"] = "001";
+    func3Data["slt"] = "010";
+    func3Data["sra"] = "101";
+    func3Data["srl"] = "101";
+    func3Data["sub"] = "000";
+    func3Data["xor"] = "100";
+    func3Data["mul"] = "000";
+    func3Data["div"] = "100";
+    func3Data["rem"] = "110";
+    func3Data["addi"] = "000";
+    func3Data["andi"] = "111";
+    func3Data["ori"] = "110";
+    func3Data["lb"] = "000";
+    func3Data["lh"] = "001";
+    func3Data["lw"] = "010";
+    func3Data["ld"] = "011";
+    func3Data["jalr"] = "000";
+    func3Data["sb"] = "000";
+    func3Data["sh"] = "001";
+    func3Data["sw"] = "010";
+    func3Data["sd"] = "011";
+    func3Data["beq"] = "000";
+    func3Data["bne"] = "001";
+    func3Data["blt"] = "100";
+    func3Data["bge"] = "101";
+    func3Data["auipc"] = "";
+    func3Data["lui"] = "";
+    func3Data["jal"] = "";
 
-    instructionData["sll"]["opcode"] = "0110011";
-    instructionData["sll"]["func3"] = "001";
-    instructionData["sll"]["func7"] = "0000000";
-    instructionData["sll"]["type"] = "R";
+    func7Data["add"] = "0000000";
+    func7Data["and"] = "0000000";
+    func7Data["or"] = "0000000";
+    func7Data["sll"] = "0000000";
+    func7Data["slt"] = "0000000";
+    func7Data["sra"] = "0100000";
+    func7Data["srl"] = "0000000";
+    func7Data["sub"] = "0100000";
+    func7Data["xor"] = "0000000";
+    func7Data["mul"] = "0000001";
+    func7Data["div"] = "0000001";
+    func7Data["rem"] = "0000001";
+    func7Data["addi"] = "";
+    func7Data["andi"] = "";
+    func7Data["ori"] = "";
+    func7Data["lb"] = "";
+    func7Data["lh"] = "";
+    func7Data["lw"] = "";
+    func7Data["ld"] = "";
+    func7Data["jalr"] = "";
+    func7Data["sb"] = "";
+    func7Data["sh"] = "";
+    func7Data["sw"] = "";
+    func7Data["sd"] = "";
+    func7Data["beq"] = "";
+    func7Data["bne"] = "";
+    func7Data["blt"] = "";
+    func7Data["bge"] = "";
+    func7Data["auipc"] = "";
+    func7Data["lui"] = "";
+    func7Data["jal"] = "";
 
-    instructionData["slt"]["opcode"] = "0110011";
-    instructionData["slt"]["func3"] = "010";
-    instructionData["slt"]["func7"] = "0000000";
-    instructionData["slt"]["type"] = "R";
 
-    instructionData["sra"]["opcode"] = "0110011";
-    instructionData["sra"]["func3"] = "101";
-    instructionData["sra"]["func7"] = "0100000";
-    instructionData["sra"]["type"] = "R";
-
-    instructionData["srl"]["opcode"] = "0110011";
-    instructionData["srl"]["func3"] = "101";
-    instructionData["srl"]["func7"] = "0000000";
-    instructionData["srl"]["type"] = "R";
-
-    instructionData["sub"]["opcode"] = "0110011";
-    instructionData["sub"]["func3"] = "000";
-    instructionData["sub"]["func7"] = "0100000";
-    instructionData["sub"]["type"] = "R";
-
-    instructionData["xor"]["opcode"] = "0110011";
-    instructionData["xor"]["func3"] = "100";
-    instructionData["xor"]["func7"] = "0000000";
-    instructionData["xor"]["type"] = "R";
-
-    instructionData["mul"]["opcode"] = "0110011";
-    instructionData["mul"]["func3"] = "000";
-    instructionData["mul"]["func7"] = "0000001";
-    instructionData["mul"]["type"] = "R";
-
-    instructionData["div"]["opcode"] = "0110011";
-    instructionData["div"]["func3"] = "100";
-    instructionData["div"]["func7"] = "0000001";
-    instructionData["div"]["type"] = "R";
-
-    instructionData["rem"]["opcode"] = "0110011";
-    instructionData["rem"]["func3"] = "110";
-    instructionData["rem"]["func7"] = "0000001";
-    instructionData["rem"]["type"] = "R";
-
-    instructionData["addi"]["opcode"] = "0010011";
-    instructionData["addi"]["func3"] = "000";
-    instructionData["addi"]["type"] = "I";
-
-    instructionData["andi"]["opcode"] = "0010011";
-    instructionData["andi"]["func3"] = "111";
-    instructionData["andi"]["type"] = "I";
-
-    instructionData["ori"]["opcode"] = "0010011";
-    instructionData["ori"]["func3"] = "110";
-    instructionData["ori"]["type"] = "I";
-
-    instructionData["lb"]["opcode"] = "0000011";
-    instructionData["lb"]["func3"] = "000";
-    instructionData["lb"]["type"] = "I";
-
-    instructionData["lh"]["opcode"] = "0000011";
-    instructionData["lh"]["func3"] = "001";
-    instructionData["lh"]["type"] = "I";
-
-    instructionData["lw"]["opcode"] = "0000011";
-    instructionData["lw"]["func3"] = "010";
-    instructionData["lw"]["type"] = "I";
-
-    instructionData["ld"]["opcode"] = "0000011";
-    instructionData["ld"]["func3"] = "011";
-    instructionData["ld"]["type"] = "I";
-
-    instructionData["jalr"]["opcode"] = "1100111";
-    instructionData["jalr"]["func3"] = "000";
-    instructionData["jalr"]["type"] = "I";
-
-    instructionData["sb"]["opcode"] = "0100011";
-    instructionData["sb"]["func3"] = "000";
-    instructionData["sb"]["type"] = "S";
-
-    instructionData["sh"]["opcode"] = "0100011";
-    instructionData["sh"]["func3"] = "001";
-    instructionData["sh"]["type"] = "S";
-
-    instructionData["sw"]["opcode"] = "0100011";
-    instructionData["sw"]["func3"] = "010";
-    instructionData["sw"]["type"] = "S";
-
-    instructionData["sd"]["opcode"] = "0100011";
-    instructionData["sd"]["func3"] = "011";
-    instructionData["sd"]["type"] = "S";
-
-    instructionData["beq"]["opcode"] = "1100011";
-    instructionData["beq"]["func3"] = "000";
-    instructionData["beq"]["type"] = "SB";
-
-    instructionData["bne"]["opcode"] = "1100011";
-    instructionData["bne"]["func3"] = "001";
-    instructionData["bne"]["type"] = "SB";
-
-    instructionData["blt"]["opcode"] = "1100011";
-    instructionData["blt"]["func3"] = "100";
-    instructionData["blt"]["type"] = "SB";
-
-    instructionData["bge"]["opcode"] = "1100011";
-    instructionData["bge"]["func3"] = "101";
-    instructionData["bge"]["type"] = "SB";
-
-    instructionData["auipc"]["opcode"] = "0010111";
-    instructionData["auipc"]["type"] = "U";
-
-    instructionData["lui"]["opcode"] = "0110111";
-    instructionData["lui"]["type"] = "U";
-
-    instructionData["jal"]["opcode"] = "1101111";
-    instructionData["jal"]["type"] = "UJ";
 
 }
 

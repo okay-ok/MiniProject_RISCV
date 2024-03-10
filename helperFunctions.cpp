@@ -10,9 +10,8 @@ string registerToBinary(string reg) {
     return bitset<5>(regNum).to_string();
 }
 
-string immediateToBinary(string imm, int bits) {
-    int value = stoi(imm);
-    return bitset<32>(value).to_string().substr(32 - bits, bits); // Convert to binary and take the last 'bits' bits
+string immediateToBinary(int imm, int bits=12) {
+    return bitset<bits>(imm).to_string();
 }
 
 string decimalToHexadecimal(int decimal) {
