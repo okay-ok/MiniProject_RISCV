@@ -15,5 +15,5 @@ g++ RICV_mini.cpp helperFunctions.cpp -o RICV_mini
 ```
 
 ## Authors
-- [@okay-ok](https://github.com/okay-ok) Hiren Gupta (2021MCB1245)
+- [@okay-ok](https://github.com/okay-ok) Hiren Gupta (2021MCB1234)
 - [@debesis27](https://github.com/debesis27) Shivam Maske (2021MCB1245)
